@@ -1,41 +1,33 @@
 <?php
 
-namespace Router;
+namespace Routes;
 
-class Route
+class Route 
 {
+
     private $path;
     private $callable;
-    private $matches;
+    private $matches = [];
 
-    public function __construct($path, $callable)
-    {
+    public function __construct($path, $callable) {
+
         $this->path = trim($path, '/');
         $this->callable = $callable;
+
     }
 
-    public function match(string $url)
+    public function match($url)
     {
         $url = trim($url, '/');
+
         $path = preg_replace("#:([\w]+)#", "([^/]+)", $this->path);
+        $regex = "#^$path$#i"; 
 
-        /**
-         * l'ajout de i pe pour prendre le url typée le majuscule sera 
-         * pris en compte
-         */
-
-        $regex = "#^$path$#i";
-        
         if(!preg_match($regex, $url, $matches)){
-            
-            return false;
-            
-        }
 
-        /**
-         * supprime juste la premiere partie du table matches
-         * c.a.d l'index 0
-         */
+            return false;
+
+        }
 
         array_shift($matches);
         $this->matches = $matches;
@@ -43,13 +35,9 @@ class Route
 
     }
 
-    public function call()
+    public function execute()
     {
-        if(is_callable($this->callable)){
-        
-            return call_user_func_array($this->callable, $this->matches);
-        
-        }
+        return call_user_func_array($this->callable, $this->matches);
     }
 
 }
