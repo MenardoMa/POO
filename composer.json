@@ -1,0 +1,12 @@
+{
+    "name": "admin/side",
+    "autoload": {
+        "psr-4": {
+            "Routes\\": "routes/",
+            "App\\": "app/",
+            "Database\\": "database/"
+        },
+        "files" : ["app/helpers/helpers.php"]
+    },
+    "require": {}
+}

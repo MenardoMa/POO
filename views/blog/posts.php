@@ -1,0 +1,1 @@
+<h1>Posts <?= $params['id']; ?>-<?= $params['slug']; ?></h1>

@@ -1,5 +1,2 @@
-*.md
 vendor/*
 *.txt
-*.json
-*.htaccess
