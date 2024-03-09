@@ -1,4 +1,51 @@
 
+
+
+
+
 div{
-    background-color: #DDDD;
+
+    background-color: #DDD;
+
+}
+
+h1,h2,h3{
+
+    text-transform: lowercase;
+
+}
+
+h1::first-letter,
+h2::first-letter,
+h3::first-letter,
+.title::first-letter{
+
+    text-transform: uppercase;
+
+}
+
+p > a{
+
+    text-decoration: none;
+    margin: 0px 1px;
+
+}
+
+p > a:first-child{
+
+    margin-left: 0;
+
+}
+
+div.transparent{
+
+    background-color: transparent;
+
+}
+
+select{
+
+    width: 250px;
+    height: 180px;
+
 }

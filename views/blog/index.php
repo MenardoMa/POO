@@ -1,2 +1,1 @@
-
-<h1>comments</h1>
+<h1>index</h1>

@@ -2,56 +2,45 @@
 
 namespace Routes;
 
-use Database\Database;
+use Database\database;
 
 class Route
 {
     private string $path;
-    private string $action;
-    private array  $matches;
-    private array  $params;
-    private array  $routeName = [];
+    private $action;
+    private array $matches;
+    private array $params = [];
 
-    public function __construct(string $path, string $action)
+    public function __construct(string $path, string|callable $action)
     {
         $this->path = trim($path, '/');
         $this->action = $action;
-
     }
 
     public function match(string $url)
     {
         $url = trim($url, '/');
         $path = preg_replace_callback("#({[\w]+})#", [$this, 'paramMatch'], $this->path);
-        $pathTmatch = "#^$path$#i"; 
+        $regex = "#^$path$#i";
 
-        if(!preg_match($pathTmatch, $url, $matches)){
-
+        if(!preg_match($regex, $url, $matches)){
             return false;
-
         }
 
         array_shift($matches);
         $this->matches = $matches;
         return true;
-
-    }
-
-    public function name(string $name = null)
-    {
-        $this->routeName[$name] = $this->path;
-        return $this->routeName;
     }
 
     public function where($param, $regex)
     {
-        $this->params[$param] = str_replace("(", "(?:", $regex);
-        return $this;
+        $this->params[$param] = str_replace('(', '(?:', $regex);
+        return $this->params;
     }
 
     public function paramMatch($match)
     {
-        if(isset($this->params[$match[1]])){    
+        if(isset($this->params[$match[1]])){
             return '('. $this->params[$match[1]] .')';
         }else{
             return "([^/]+)";
@@ -60,14 +49,18 @@ class Route
 
     public function execute()
     {
-        $param = explode("@", $this->action);
-        $controller = new $param[0](new Database("comments", "127.0.0.1", "root", "" ));
-        $method     = $param[1];
+        
+        if(is_string($this->action))
+        {
+            $params = explode("@", $this->action);
+            $controller = new $params[0](new database('test', "127.0.0.1", "root", ""));
+            $method = $params[1];
 
-        // return isset($this->matches[0]) ? 
-        // $controller->$method($this->matches[0]) : $controller->$method();
+            return isset($this->matches[0]) ? $controller->$method($this->matches[0]) :  $controller->$method();
 
-        return call_user_func_array([$controller, $method], $this->matches);
+        }else{
 
+            return call_user_func_array($this->action, $this->matches);
+        }
     }
 }

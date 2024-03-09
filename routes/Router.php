@@ -2,27 +2,29 @@
 
 namespace Routes;
 
+use App\Exception\RouteException;
+
 class Router
 {
     private string $url;
-    private array $routes;
+    private array $routes = [];
 
     public function __construct(string $url)
     {
         $this->url = $url;
     }
 
-    public function get(string $path, string $action)
+    public function get(string $path, string|callable $action)
     {
-        return $this->addMethod($path, $action, 'GET'); 
+       return $this->addRoute($path, $action, 'GET'); 
     }
 
-    public function post(string $path, string $action)
+    public function post(string $path, string|callable $action)
     {
-        return $this->addMethod($path, $action, 'POST');         
+       return $this->addRoute($path, $action, 'POST');
     }
 
-    public function addMethod($path, $action, $method)
+    private function addRoute(string $path, string|callable $action, $method)
     {
         $route = new Route($path, $action);
         $this->routes[$method][] = $route;
@@ -31,45 +33,19 @@ class Router
 
     public function run()
     {
-        if(!isset($this->routes[$_SERVER['REQUEST_METHOD']])){
-            throw new Exception("REQUEST_METHOD does not exist");
+        if(!isset($this->routes[$_SERVER["REQUEST_METHOD"]])){
+            throw new RouteException("REQUEST_METHOD does not exist");
         }
 
-        foreach($this->routes[$_SERVER['REQUEST_METHOD']] as $route)
-        {   
+        foreach($this->routes[$_SERVER["REQUEST_METHOD"]] as $route){
             if($route->match($this->url)){
                 return $route->execute();
                 die();
             }
         }
 
-        return throw new Exception("Page Not Found");
-
+        throw new RouteException("Route not found");
+        
     }
-
-    /**
-     * name
-     */
-
-     public function url($name, $param = [])
-     {
-        foreach($this->routes as $k => $v)
-        {
-            foreach($this->routes[$k] as $routes){
-                if(array_key_exists($name, $routes->name())){
-                    $route = $routes->name();
-                    $path  = $route[$name];
-                    if(!empty($param)){
-                        foreach($param as $k => $v){
-                            $url = str_replace("{{$k}}", $v, $path);
-                            return '/'.$url;
-                        }
-                    }else{
-                        return "/" .$path;
-                    }
-                }
-            }
-        }
-     }
 
 }
